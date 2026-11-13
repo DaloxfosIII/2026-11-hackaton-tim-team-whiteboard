@@ -1,4 +1,5 @@
 import logging
+import re
 
 from .ModelChoices import ModelChoice
 from .MetricScores import MetricScores
@@ -19,22 +20,51 @@ def route_prompt_to_model(prompt: str) -> ModelChoice:
     return model_pick
 
 
+# Word stems that ask for reasoning, mechanisms or discussion rather than a single fact.
+_EXPLANATORY = re.compile(
+    r"\b("
+    r"why|explain\w*|describe\w*|discuss\w*|compare\w*|contrast\w*|analy[sz]\w*|evaluate\w*|"
+    r"elaborate\w*|justify|argue\w*|argument\w*|counterargument\w*|present|"
+    r"differences?|pros and cons|advantages|disadvantages|implications?|"
+    r"how (?:does|do|did|can|could|would|is|are)"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Per-class medians of the measured results in tests/test_cases (10 cases, 2026-11-13),
+# as fitted by tests/predict_metrics/candidate_functions/question_type_median.py.
+# Refit and paste again when the test cases change.
+_CLASS_MEDIANS: dict[str, dict[ModelChoice, MetricScores]] = {
+    "explanatory": {
+        "claude-haiku-5-5": MetricScores(cost=0.0005853, latency=6.307, quality=4.5),
+        "claude-sonnet-5-5": MetricScores(cost=0.006388, latency=5.331, quality=4.5),
+        "claude-opus-5-5": MetricScores(cost=0.018312, latency=8.721, quality=5.0),
+    },
+    "factual": {
+        "claude-haiku-5-5": MetricScores(cost=0.0000323, latency=1.202, quality=5.0),
+        "claude-sonnet-5-5": MetricScores(cost=0.000896, latency=1.316, quality=4.0),
+        "claude-opus-5-5": MetricScores(cost=0.001572, latency=1.562, quality=5.0),
+    },
+}
+
+
+def is_explanatory(prompt: str) -> bool:
+    return _EXPLANATORY.search(prompt) is not None
+
+
 def predict_metrics(prompt: str) -> dict[ModelChoice, MetricScores]:
     """
     This function predicts the metrics that different models will receive on our
     prompt.
 
-    Dummy implementation: fixed numbers, scaled slightly by prompt length.
-    Quality is on the 0-5 scale from tests/quality_scale.md.
+    Classifies the prompt as explanatory ("why ...", "explain ...", "compare ...")
+    or matter-of-fact, and returns each model's median measured cost, latency and
+    quality for that class. Explanatory questions get long answers, so they cost
+    roughly 10x more. Quality is on the 0-5 scale from tests/quality_scale.md.
     """
 
-    scale = 1 + len(prompt) / 1000
-
-    return {
-        "claude-haiku-5-5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=3.0),
-        "claude-sonnet-5-5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=4.0),
-        "claude-opus-5-5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=4.75),
-    }
+    label = "explanatory" if is_explanatory(prompt) else "factual"
+    return {model: scores.model_copy() for model, scores in _CLASS_MEDIANS[label].items()}
 
 
 def expected_reward(scores: MetricScores, policy: RoutingPolicy) -> float:
