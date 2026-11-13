@@ -1,12 +1,16 @@
+import logging
 
-from Models import ModelChoices
+from .ModelChoices import ModelChoice
+from .MetricScores import MetricScores
+
+logger = logging.getLogger(__name__)
 
 
-def route_prompt_to_model(prompt: str) -> ModelChoices:
+def route_prompt_to_model(prompt: str) -> ModelChoice:
     """
     The wrapper function of our router. Will always return a model choice.
     """
-    
+
     expected_metrics = predict_metrics(prompt)
 
     model_pick = pick_model(expected_metrics)
@@ -14,20 +18,40 @@ def route_prompt_to_model(prompt: str) -> ModelChoices:
     return model_pick
 
 
-
-def predict_metrics(prompt: str) -> MetricScores:
+def predict_metrics(prompt: str) -> dict[ModelChoice, MetricScores]:
     """
     This function predicts the metrics that different models will receive on our
     prompt.
+
+    Dummy implementation: fixed numbers, scaled slightly by prompt length.
     """
 
-    return MetricScores
+    scale = 1 + len(prompt) / 1000
+
+    return {
+        "claude-haiku-5.5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=0.6),
+        "claude-sonnet-5.5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=0.8),
+        "claude-opus-5.5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=0.95),
+    }
 
 
-def pick_model(MetricScores) -> ModelChoices:
+def pick_model(scores: dict[ModelChoice, MetricScores]) -> ModelChoice:
     """
     This function uses the scored predicted metrics to pick the correct model.
 
+    Dummy implementation: best quality per dollar.
     """
 
-    return ModelChoices
+    return max(scores, key=lambda model: scores[model].quality / scores[model].cost)
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO)
+
+    prompt = "Write a haiku about routers."
+    logger.info("Prompt: %r", prompt)
+    logger.info("Picked model: %s", route_prompt_to_model(prompt))
+
+
+if __name__ == "__main__":
+    main()
