@@ -29,9 +29,9 @@ def predict_metrics(prompt: str) -> dict[ModelChoice, MetricScores]:
     scale = 1 + len(prompt) / 1000
 
     return {
-        "claude-haiku-5.5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=0.6),
-        "claude-sonnet-5.5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=0.8),
-        "claude-opus-5.5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=0.95),
+        "claude-haiku-5-5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=0.6),
+        "claude-sonnet-5-5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=0.8),
+        "claude-opus-5-5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=0.95),
     }
 
 
@@ -39,10 +39,10 @@ def pick_model(scores: dict[ModelChoice, MetricScores]) -> ModelChoice:
     """
     This function uses the scored predicted metrics to pick the correct model.
 
-    Dummy implementation: best quality per dollar.
+    Dummy implementation: best quality per dollar. Unscored quality counts as 0.
     """
 
-    return max(scores, key=lambda model: scores[model].quality / scores[model].cost)
+    return max(scores, key=lambda model: (scores[model].quality or 0.0) / scores[model].cost)
 
 
 def main() -> None:
