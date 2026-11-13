@@ -89,11 +89,12 @@ def cli() -> None:
     ap.add_argument("--cwd", default=".", help="directory Claude Code works in")
     ap.add_argument("--permission-mode", default="acceptEdits",
                     help="Claude Code permission mode (acceptEdits, dontAsk, bypassPermissions, plan, ...)")
+    ap.add_argument("--session", help="continue this Claude Code session id (one-shot mode)")
     ap.add_argument("--use-api-key", action="store_true", help="bill ANTHROPIC_API_KEY instead of your plan")
     args = ap.parse_args()
 
     if args.prompt:
-        turn(" ".join(args.prompt), None, args)
+        print(f"[router] session {turn(' '.join(args.prompt), args.session, args)}")
         return
     print("llm-router chat. Commands: /model haiku|sonnet|opus|auto, /new, /quit")
     session = None
