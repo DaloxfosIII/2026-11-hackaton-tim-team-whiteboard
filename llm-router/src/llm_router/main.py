@@ -94,7 +94,15 @@ def pick_model(
         logger.warning("No model has a quality score; using fallback %s", policy.fallback)
         return policy.fallback
 
-    return max(scored, key=lambda model: (expected_reward(scored[model], policy), -scored[model].cost))
+    # Evaluate every model once and store its ranking values.
+    rankings: dict[ModelChoice, tuple[float, float]] = {}
+    for model, model_score in scored.items():
+        reward = expected_reward(model_score, policy)
+        rankings[model] = (reward, -model_score.cost)
+
+    # Higher reward wins; on equal reward, the lower cost wins
+    # (cost is negated because max() prefers larger values).
+    return max(rankings, key=lambda model: rankings[model])
 
 
 def main() -> None:
