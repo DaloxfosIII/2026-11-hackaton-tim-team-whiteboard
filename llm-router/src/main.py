@@ -1,6 +1,11 @@
-import logging
-import re
-import sys
+import time
+
+# Start the clock before any other import, so loading pydantic etc. counts too.
+_START = time.perf_counter()
+
+import logging  # noqa: E402
+import re  # noqa: E402
+import sys  # noqa: E402
 from pathlib import Path
 
 # Running "python src/main.py" puts src/ on sys.path, not the project root, so
@@ -113,12 +118,31 @@ def pick_model(
     return max(rankings, key=lambda model: rankings[model])
 
 
+# Number of timed route_prompt_to_model calls (keep equal to BENCH_RUNS in src-rs/main.rs).
+BENCH_RUNS = 20
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     prompt = "Write a haiku about routers."
     logger.info("Prompt: %r", prompt)
     logger.info("Picked model: %s", route_prompt_to_model(prompt))
+
+    # Time the routing itself, call by call.
+    times_us = []
+    for _ in range(BENCH_RUNS):
+        t = time.perf_counter()
+        route_prompt_to_model(prompt)
+        times_us.append((time.perf_counter() - t) * 1e6)
+    mean = sum(times_us) / len(times_us)
+    print(
+        f"route_prompt_to_model x{len(times_us)}: "
+        f"mean {mean:.3f} us, min {min(times_us):.3f} us, max {max(times_us):.3f} us"
+    )
+
+    elapsed = time.perf_counter() - _START
+    print(f"Total runtime: {elapsed * 1000:.3f} ms")
 
 
 if __name__ == "__main__":

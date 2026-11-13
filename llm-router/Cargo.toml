@@ -1,0 +1,16 @@
+[package]
+name = "llm-router"
+version = "1.0.0"
+edition = "2024"
+
+# The Rust port lives in src-rs/ so it doesn't collide with the Python src/.
+[[bin]]
+name = "llm-router"
+path = "src-rs/main.rs"
+
+[dependencies]
+regex = "1.13.1"
+
+[profile.release]
+lto = true
+codegen-units = 1

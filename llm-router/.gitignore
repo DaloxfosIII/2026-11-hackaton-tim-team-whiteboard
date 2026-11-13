@@ -10,3 +10,6 @@ tests/predict_metrics/results/
 # Harness run outputs
 logs/
 eval-results/
+
+# Rust build output
+target/
