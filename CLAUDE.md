@@ -14,6 +14,14 @@
 
 Wiring either predictor into `predict_metrics` changes routing, so that's a team decision. Quality is still the open problem.
 
+## Weighted picking
+
+`Weights.py` adds `route_prompt_to_model(prompt, weights)` and `pick_model_weighted`. The default routing (RoutingPolicy reward) is unchanged.
+- Metrics are normalized across models, and each preset is set by a stated trade-off: how many quality points on the 0-5 scale justify the priciest or the slowest model.
+- Presets:
+  - `coding` (0.5 / 0.5), calibrated on our coding eval, where it picks Sonnet.
+  - `urgent` (1 / 3).
+
 ## Harness (all on the Claude Pro/Max login via `claude -p`, no API key needed)
 
 - `llm-router-chat`: chat with Claude Code where every prompt goes through `route_prompt_to_model`. Logs predicted vs actual metrics to `llm-router/logs/runs.jsonl`.

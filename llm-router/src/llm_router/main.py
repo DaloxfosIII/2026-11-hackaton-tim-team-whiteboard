@@ -3,18 +3,22 @@ import logging
 from .ModelChoices import ModelChoice
 from .MetricScores import MetricScores
 from .RoutingPolicy import DEFAULT_POLICY, RoutingPolicy
+from .Weights import Weights, pick_model_weighted
 
 logger = logging.getLogger(__name__)
 
 
-def route_prompt_to_model(prompt: str) -> ModelChoice:
+def route_prompt_to_model(prompt: str, weights: Weights | None = None) -> ModelChoice:
     """
     The wrapper function of our router. Will always return a model choice.
+
+    weights (optional): pick by weighted metrics instead of the RoutingPolicy reward,
+    e.g. Weights.parse("coding") or Weights.from_tolerance(cost_points=1, time_points=3). See Weights.py.
     """
 
     expected_metrics = predict_metrics(prompt)
 
-    model_pick = pick_model(expected_metrics)
+    model_pick = pick_model(expected_metrics) if weights is None else pick_model_weighted(expected_metrics, weights)
 
     return model_pick
 

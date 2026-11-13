@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 
 from .main import predict_metrics, route_prompt_to_model
+from .Weights import Weights
 from .ModelChoices import ModelChoice, ModelChoices
 
 CLI_MODEL: dict[ModelChoice, str] = {m: m for m in ModelChoices}  # ModelChoice strings are the API/CLI IDs
@@ -35,7 +36,8 @@ def env(use_api_key: bool) -> dict:
 def turn(prompt: str, session: str | None, args, out=None) -> str | None:
     """Route, run one Claude Code turn, stream its output, log metrics. Returns the session id."""
     out = out or sys.stdout
-    model = SHORT[args.model] if args.model else route_prompt_to_model(prompt)
+    weights = Weights.parse(args.weights) if getattr(args, "weights", None) else None
+    model = SHORT[args.model] if args.model else route_prompt_to_model(prompt, weights)
     predicted = predict_metrics(prompt)[model]
     print(f"\033[2m[router] -> {model}  (predicted ${predicted.cost:.4f}, {predicted.latency:.1f}s, "
           f"quality {predicted.quality:.2f})\033[0m", file=out, flush=True)
@@ -85,6 +87,7 @@ def cli() -> None:
     ap = argparse.ArgumentParser(description="Claude Code behind the llm-router")
     ap.add_argument("prompt", nargs="*", help="one-shot prompt; omit for interactive chat")
     ap.add_argument("--model", choices=sorted(SHORT), help="skip the router and force a model")
+    ap.add_argument("--weights", help="coding | urgent | q=1,c=0.1,t=0.1  (default: RoutingPolicy reward)")
     ap.add_argument("--cwd", default=".", help="directory Claude Code works in")
     ap.add_argument("--permission-mode", default="acceptEdits",
                     help="Claude Code permission mode (acceptEdits, dontAsk, bypassPermissions, plan, ...)")
