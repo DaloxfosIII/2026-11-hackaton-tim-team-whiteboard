@@ -6,9 +6,9 @@
 
 ```
 tasks.json                  manifest: id, difficulty, category, files the agent edits, test command
-tasks/<id>/prompt.md        the prompt to send to the agent
-tasks/<id>/workspace/       starting code; the agent works in a copy of this directory
-tasks/<id>/tests/           hidden tests; do not expose these to the agent
+test_cases/<id>/prompt.md        the prompt to send to the agent
+test_cases/<id>/workspace/       starting code; the agent works in a copy of this directory
+test_cases/<id>/tests/           hidden tests; do not expose these to the agent
 ```
 
 ## Protocol per task and model
