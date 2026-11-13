@@ -10,8 +10,8 @@ If a class has no training cases, it falls back to the model's overall median.
 from collections.abc import Callable, Sequence
 from statistics import median
 
-from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import ModelChoice
+from src.MetricScores import MetricScores
+from src.ModelChoices import ModelChoice
 from test_data import TestCase
 
 Predictor = Callable[[str], dict[ModelChoice, MetricScores]]

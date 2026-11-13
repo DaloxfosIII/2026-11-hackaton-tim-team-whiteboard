@@ -35,9 +35,13 @@ import pandas as pd
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-import candidate_functions
-from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import ModelChoice
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # llm-router/, so `src` imports
+
+import candidate_functions  # noqa: E402
+from src.MetricScores import MetricScores  # noqa: E402
+from src.ModelChoices import ModelChoice  # noqa: E402
 from test_data import TestCase, load_cases
 
 logger = logging.getLogger(__name__)

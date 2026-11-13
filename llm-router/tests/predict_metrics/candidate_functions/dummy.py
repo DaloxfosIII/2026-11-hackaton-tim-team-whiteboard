@@ -1,8 +1,8 @@
 """Baseline: the predict_metrics currently shipped in llm_router.main."""
 
-from llm_router.main import predict_metrics
-from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import ModelChoice
+from src.main import predict_metrics
+from src.MetricScores import MetricScores
+from src.ModelChoices import ModelChoice
 
 NAME = "dummy"
 

@@ -19,13 +19,16 @@ Usage:
 import argparse
 import json
 import logging
+import sys
 import time
 from pathlib import Path
 
 import anthropic
 
-from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import TIERS, ModelChoice
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # llm-router/, so `src` imports
+
+from src.MetricScores import MetricScores  # noqa: E402
+from src.ModelChoices import TIERS, ModelChoice  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

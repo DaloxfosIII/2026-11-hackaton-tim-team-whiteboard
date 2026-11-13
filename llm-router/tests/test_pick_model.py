@@ -1,8 +1,8 @@
 import pytest
 
-from llm_router.main import pick_model
-from llm_router.MetricScores import MetricScores
-from llm_router.RoutingPolicy import RoutingPolicy
+from src.main import pick_model
+from src.MetricScores import MetricScores
+from src.RoutingPolicy import RoutingPolicy
 
 DUMMY = {
     "claude-haiku-5-5": MetricScores(cost=0.001, latency=0.5, quality=0.6),

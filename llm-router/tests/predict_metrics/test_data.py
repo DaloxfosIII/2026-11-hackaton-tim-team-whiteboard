@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
-from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import TIERS, ModelChoice
+from src.MetricScores import MetricScores
+from src.ModelChoices import TIERS, ModelChoice
 
 logger = logging.getLogger(__name__)
 
