@@ -1,9 +1,17 @@
 import logging
 import re
+import sys
+from pathlib import Path
 
-from src.ModelChoices import ModelChoice
-from src.MetricScores import MetricScores
-from src.RoutingPolicy import DEFAULT_POLICY, RoutingPolicy
+# Running "python src/main.py" puts src/ on sys.path, not the project root, so
+# "from src.X" would fail. Add the project root so both ways of running work.
+_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
+from src.ModelChoices import ModelChoice  # noqa: E402
+from src.MetricScores import MetricScores  # noqa: E402
+from src.RoutingPolicy import DEFAULT_POLICY, RoutingPolicy  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
