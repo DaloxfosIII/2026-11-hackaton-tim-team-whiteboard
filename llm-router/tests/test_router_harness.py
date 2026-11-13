@@ -47,3 +47,11 @@ def test_predictor_uses_measured_data():
     for m in short:
         assert long[m].cost > short[m].cost and long[m].latency > short[m].latency
     assert short["claude-haiku-5-5"].cost < short["claude-sonnet-5-5"].cost < short["claude-opus-5-5"].cost
+
+
+def test_agentic_tasks_cost_dollars_not_cents():
+    from llm_router.main import predict_metrics
+    big = predict_metrics("Implement OAuth login across the web app and API. " + "Requirement details. " * 150)
+    qa = predict_metrics("Who wrote Hamlet?")
+    assert big["claude-opus-5-5"].cost > 0.5 and big["claude-opus-5-5"].latency > 60
+    assert qa["claude-opus-5-5"].cost < 0.01

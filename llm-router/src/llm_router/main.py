@@ -2,7 +2,7 @@ import logging
 
 from .ModelChoices import ModelChoice
 from .MetricScores import MetricScores
-from . import predictor
+from . import agentic, predictor
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +24,16 @@ def predict_metrics(prompt: str) -> dict[ModelChoice, MetricScores]:
     This function predicts the metrics that different models will receive on our
     prompt.
 
-    Cost and latency: predictor fitted on the measured results in tests/test_cases.
+    Cost and latency: coding/agent tasks use the agentic predictor (fitted on 731 SWE-bench Pro
+    agent runs); single questions use the predictor fitted on tests/test_cases.
     Quality: still fixed guesses.
     """
 
     quality = {"claude-haiku-5-5": 0.6, "claude-sonnet-5-5": 0.8, "claude-opus-5-5": 0.95}
-    predicted = predictor.predict(predictor.default_params(), prompt)
+    if agentic.is_agentic(prompt):
+        predicted = agentic.predict(prompt)
+    else:
+        predicted = predictor.predict(predictor.default_params(), prompt)
 
     return {
         model: MetricScores(cost=predicted[model]["cost"], latency=predicted[model]["latency"], quality=quality[model])
