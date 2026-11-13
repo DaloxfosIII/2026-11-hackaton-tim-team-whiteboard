@@ -1,9 +1,9 @@
 import logging
 import re
 
-from .ModelChoices import ModelChoice
-from .MetricScores import MetricScores
-from .RoutingPolicy import DEFAULT_POLICY, RoutingPolicy
+from src.ModelChoices import ModelChoice
+from src.MetricScores import MetricScores
+from src.RoutingPolicy import DEFAULT_POLICY, RoutingPolicy
 
 logger = logging.getLogger(__name__)
 

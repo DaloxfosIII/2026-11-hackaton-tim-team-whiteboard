@@ -10,8 +10,8 @@ cost and latency >= 0, quality within 0-5.
 from collections.abc import Callable, Sequence
 from statistics import mean
 
-from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import ModelChoice
+from src.MetricScores import MetricScores 
+from src.ModelChoices import ModelChoice 
 from test_data import TestCase
 
 Predictor = Callable[[str], dict[ModelChoice, MetricScores]]
