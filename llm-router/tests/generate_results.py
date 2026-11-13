@@ -7,9 +7,13 @@ Layout (one folder per case):
 
 Quality is written as null so it can be scored later.
 
+By default only missing results are generated: a model is called for a case only
+if that case has no result file for that model yet. New cases and new models are
+filled in, existing results are left untouched.
+
 Usage:
-    uv run python tests/generate_results.py            # skip existing result files
-    uv run python tests/generate_results.py --force    # regenerate everything
+    uv run python tests/generate_results.py                # only missing results
+    uv run python tests/generate_results.py --overwrite    # regenerate all results
 """
 
 import argparse
@@ -70,12 +74,14 @@ def run_prompt(client: anthropic.Anthropic, model: ModelChoice, prompt: str) -> 
     return text, MetricScores(cost=cost, latency=latency, quality=None)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--force", action="store_true", help="overwrite existing result files")
-    args = parser.parse_args()
+def generate_results(overwrite: bool = False) -> None:
+    """
+    Write a result file for every (case, model) pair.
 
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    With overwrite=False (default), pairs that already have a result file are skipped.
+    With overwrite=True, every result file is regenerated.
+    """
+
     client = anthropic.Anthropic()
 
     for case_dir in sorted(p for p in CASES_DIR.iterdir() if p.is_dir()):
@@ -84,7 +90,7 @@ def main() -> None:
 
         for tier, model in TIERS.items():
             result_path = case_dir / f"{name}-result-{tier}.json"
-            if result_path.exists() and not args.force:
+            if result_path.exists() and not overwrite:
                 logger.info("skip  %-28s %-6s (exists)", name, tier)
                 continue
 
@@ -92,6 +98,15 @@ def main() -> None:
             result = {"returned": text, "quality": scores.quality, "cost": scores.cost, "latency": scores.latency}
             result_path.write_text(json.dumps(result, indent=4, ensure_ascii=False) + "\n", encoding="utf-8")
             logger.info("done  %-28s %-6s $%.5f  %.2fs", name, tier, scores.cost, scores.latency)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--overwrite", action="store_true", help="regenerate result files that already exist")
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    generate_results(overwrite=args.overwrite)
 
 
 if __name__ == "__main__":

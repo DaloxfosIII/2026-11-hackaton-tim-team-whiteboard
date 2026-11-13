@@ -1,0 +1,6 @@
+{
+    "returned": "The train arrives at **18:35** local time at the destination.\n\n- Departure: 14:45\n- Add the journey time (2 h 50 min): 14:45 + 2:50 = 17:35 in departure-station time\n- The destination is one hour ahead, so add 1 hour: 17:35 + 1:00 = **18:35**",
+    "quality": 5,
+    "cost": 0.00010520000000000001,
+    "latency": 1.333041100000628
+}

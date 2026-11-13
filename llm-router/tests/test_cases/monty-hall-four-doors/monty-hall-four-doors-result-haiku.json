@@ -1,0 +1,6 @@
+{
+    "returned": "**Stay: 1/4. Switch: 3/8.**\n\n**Staying.** Your door was chosen with no information, so it has the car with probability 1/4.\n\n**Switching.** The car is behind one of the other 3 doors with probability 3/4. The host always opens a goat door among those 3 and never the car, so the opened door carries no probability of the car. That leaves the car behind one of the 2 unopened doors other than yours with probability 3/4 in total.\n\nThose two doors are symmetric, so each has probability 3/8 of hiding the car. Switching to either one (chosen at random) wins with probability 3/8.\n\nSwitching therefore improves your chance from 1/4 to 3/8 (0.375 vs 0.25). The advantage is smaller than in the 3-door version, where switching wins with 2/3 versus 1/3, because the host's reveal removes only one of the three losing doors instead of the whole remaining set.",
+    "quality": 5,
+    "cost": 0.0005953999999999999,
+    "latency": 10.401639100000466
+}
