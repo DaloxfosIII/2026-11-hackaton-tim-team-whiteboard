@@ -27,7 +27,7 @@ from .chat import CLAUDE_BIN, CLI_MODEL, SHORT
 from .main import route_prompt_to_model
 
 ROOT = Path(__file__).resolve().parents[2]
-TASKS = ROOT / "eval-tasks"
+TASKS = ROOT / "tests"  # tasks.json + test_cases_for_later/<id>/{prompt.md,workspace,tests}
 ALLOWED = ["Read", "Edit", "Write", "Glob", "Grep", "Bash(python:*)", "Bash(python3:*)", "Bash(ls:*)", "Bash(cat:*)"]
 
 
@@ -61,7 +61,7 @@ async def sh(cmd: list[str], cwd: Path, timeout: int, **kw) -> tuple[int, str, s
 
 
 async def one(task: dict, model: str, run: int, out: Path, test_cmd: str, timeout: int) -> dict:
-    tdir, rdir = TASKS / "tasks" / task["id"], out / task["id"] / model.split("-")[1] / f"r{run}"
+    tdir, rdir = TASKS / "test_cases_for_later" / task["id"], out / task["id"] / model.split("-")[1] / f"r{run}"
     work = rdir / "work"
     shutil.copytree(tdir / "workspace", work)
     before, prompt = snapshot(work), (tdir / "prompt.md").read_text()
@@ -106,7 +106,7 @@ def report(rows: list[dict], tasks: list[dict]) -> str:
     for t in tasks:
         if not any((t["id"], m) in by for m in models):
             continue
-        pick = route_prompt_to_model((TASKS / "tasks" / t["id"] / "prompt.md").read_text())
+        pick = route_prompt_to_model((TASKS / "test_cases_for_later" / t["id"] / "prompt.md").read_text())
         stat = {m: (mean(r["pass"] for r in by[t["id"], m]), mean(r["cost"] for r in by[t["id"], m]),
                     mean(r["latency"] for r in by[t["id"], m])) for m in models if (t["id"], m) in by}
         passing = [m for m in stat if stat[m][0] >= 0.5]

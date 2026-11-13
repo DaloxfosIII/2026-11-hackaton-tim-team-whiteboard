@@ -19,9 +19,9 @@ print(json.dumps({"type": "result", "is_error": False, "total_cost_usd": 0.01, "
 
 
 def test_dummy_router_spreads_across_models():
-    assert route_prompt_to_model("Fix the typo in the README") == "claude-haiku-5.5"
-    assert route_prompt_to_model("Write a function that merges two sorted lists") == "claude-sonnet-5.5"
-    assert route_prompt_to_model("Refactor the legacy parser for concurrency") == "claude-opus-5.5"
+    assert route_prompt_to_model("Fix the typo in the README") == "claude-haiku-5-5"
+    assert route_prompt_to_model("Write a function that merges two sorted lists") == "claude-sonnet-5-5"
+    assert route_prompt_to_model("Refactor the legacy parser for concurrency") == "claude-opus-5-5"
 
 
 def test_chat_turn_routes_streams_resumes_and_logs(tmp_path, monkeypatch, capsys):
@@ -41,5 +41,5 @@ def test_chat_turn_routes_streams_resumes_and_logs(tmp_path, monkeypatch, capsys
     calls = [json.loads(line) for line in (tmp_path / "claude.args").read_text().splitlines()]
     assert "--resume" not in calls[0] and calls[1][calls[1].index("--resume") + 1] == "sess-1"
     log = [json.loads(line) for line in (tmp_path / "runs.jsonl").read_text().splitlines()]
-    assert [r["model"] for r in log] == ["claude-haiku-5.5", "claude-opus-5.5"]
+    assert [r["model"] for r in log] == ["claude-haiku-5-5", "claude-opus-5-5"]
     assert log[0]["routed"] and not log[1]["routed"] and log[0]["actual"]["cost"] == 0.01

@@ -19,8 +19,7 @@ from pathlib import Path
 from .main import predict_metrics, route_prompt_to_model
 from .ModelChoices import ModelChoice, ModelChoices
 
-# Router names use dots; Claude Code / API model IDs use dashes.
-CLI_MODEL: dict[ModelChoice, str] = {m: m.replace(".", "-") for m in ModelChoices}
+CLI_MODEL: dict[ModelChoice, str] = {m: m for m in ModelChoices}  # ModelChoice strings are the API/CLI IDs
 SHORT = {m.split("-")[1]: m for m in ModelChoices}  # haiku / sonnet / opus
 LOG = Path(os.environ.get("LLM_ROUTER_LOG", Path(__file__).resolve().parents[2] / "logs" / "runs.jsonl"))
 CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
