@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "test_cmd": "python -m pytest -q -p no:cacheprovider tests",
+  "tasks": [
+    {"id": "E01_slugify", "difficulty": "easy", "category": "implement", "files": ["text_utils.py"]},
+    {"id": "E02_chunk_bugfix", "difficulty": "easy", "category": "bugfix", "files": ["listops.py"]},
+    {"id": "E03_roman", "difficulty": "easy", "category": "implement", "files": ["roman.py"]},
+    {"id": "E04_parse_duration", "difficulty": "easy", "category": "implement", "files": ["duration.py"]},
+    {"id": "E05_merge_intervals_bugfix", "difficulty": "easy", "category": "bugfix", "files": ["intervals.py"]},
+    {"id": "M01_ttl_lru_cache", "difficulty": "medium", "category": "implement", "files": ["cache.py"]},
+    {"id": "M02_money_allocation", "difficulty": "medium", "category": "implement", "files": ["money.py"]},
+    {"id": "M03_csv_line_parser", "difficulty": "medium", "category": "implement", "files": ["csvline.py"]},
+    {"id": "M04_toposort_cycles", "difficulty": "medium", "category": "implement", "files": ["graph.py"]},
+    {"id": "M05_inventory_multifile_bugfix", "difficulty": "medium", "category": "bugfix", "files": ["inventory/models.py", "inventory/service.py"]},
+    {"id": "H01_expression_evaluator", "difficulty": "hard", "category": "implement", "files": ["expr.py"]},
+    {"id": "H02_cron_next_run", "difficulty": "hard", "category": "implement", "files": ["cron.py"]},
+    {"id": "H03_minimal_line_diff", "difficulty": "hard", "category": "implement", "files": ["linediff.py"]},
+    {"id": "H04_json_patch", "difficulty": "hard", "category": "implement", "files": ["jsonpatch_lite.py"]},
+    {"id": "H05_glob_matcher", "difficulty": "hard", "category": "implement", "files": ["globmatch.py"]}
+  ]
+}
