@@ -2,6 +2,7 @@ import logging
 
 from .ModelChoices import ModelChoice
 from .MetricScores import MetricScores
+from . import predictor
 
 logger = logging.getLogger(__name__)
 
@@ -23,15 +24,16 @@ def predict_metrics(prompt: str) -> dict[ModelChoice, MetricScores]:
     This function predicts the metrics that different models will receive on our
     prompt.
 
-    Dummy implementation: fixed numbers, scaled slightly by prompt length.
+    Cost and latency: predictor fitted on the measured results in tests/test_cases.
+    Quality: still fixed guesses.
     """
 
-    scale = 1 + len(prompt) / 1000
+    quality = {"claude-haiku-5-5": 0.6, "claude-sonnet-5-5": 0.8, "claude-opus-5-5": 0.95}
+    predicted = predictor.predict(predictor.default_params(), prompt)
 
     return {
-        "claude-haiku-5-5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=0.6),
-        "claude-sonnet-5-5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=0.8),
-        "claude-opus-5-5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=0.95),
+        model: MetricScores(cost=predicted[model]["cost"], latency=predicted[model]["latency"], quality=quality[model])
+        for model in quality
     }
 
 

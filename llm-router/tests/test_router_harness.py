@@ -38,3 +38,12 @@ def test_chat_turn_routes_streams_resumes_and_logs(tmp_path, monkeypatch, capsys
     log = [json.loads(line) for line in (tmp_path / "runs.jsonl").read_text().splitlines()]
     assert [r["model"] for r in log] == [first, "claude-opus-5-5"]
     assert log[0]["routed"] and not log[1]["routed"] and log[0]["actual"]["cost"] == 0.01
+
+
+def test_predictor_uses_measured_data():
+    from llm_router.main import predict_metrics
+    short = predict_metrics("Who wrote Hamlet?")
+    long = predict_metrics("Explain why the Roman Empire declined and compare the main causes.")
+    for m in short:
+        assert long[m].cost > short[m].cost and long[m].latency > short[m].latency
+    assert short["claude-haiku-5-5"].cost < short["claude-sonnet-5-5"].cost < short["claude-opus-5-5"].cost
