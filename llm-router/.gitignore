@@ -5,3 +5,7 @@ tests/predict_metrics/results/
 
 # Cache files
 *.pyc
+
+# Harness run outputs
+logs/
+eval-results/
