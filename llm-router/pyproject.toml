@@ -16,6 +16,7 @@ dependencies = [
 llm-router = "llm_router:main"
 llm-router-chat = "llm_router.chat:cli"
 llm-router-eval = "llm_router.eval:cli"
+llm-router-compare = "llm_router.compare:cli"
 
 [build-system]
 requires = ["uv_build>=0.13.8,<0.14.0"]
