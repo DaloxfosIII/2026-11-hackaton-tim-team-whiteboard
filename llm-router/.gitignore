@@ -1,4 +1,7 @@
 
-.env
+*.env
 # Prediction evaluation reports
 tests/predict_metrics/results/
+
+# Cache files
+*.pyc

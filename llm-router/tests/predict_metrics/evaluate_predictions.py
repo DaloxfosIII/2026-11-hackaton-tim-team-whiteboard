@@ -2,6 +2,10 @@
 Run every candidate prediction function over the test cases and compare its
 predictions with the measured results, per model and per metric.
 
+Candidates that define fit(cases) are scored leave-one-out: each case is
+predicted by a version fitted on all other cases, so fitting cannot simply
+memorize the answer. Candidates with only predict() are scored as they are.
+
 Error measure: squared residual (predicted - actual)^2, aggregated as
 MSE and RMSE (RMSE is in the metric's own unit: USD, seconds, quality points).
 Only compare a metric across candidates, not metrics with each other: their
@@ -22,7 +26,8 @@ import importlib
 import logging
 import math
 import pkgutil
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -42,13 +47,26 @@ RESULTS_DIR = Path(__file__).parent / "results"
 BEST_FILL = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
 
 Predictor = Callable[[str], dict[ModelChoice, MetricScores]]
+Fitter = Callable[[Sequence[TestCase]], Predictor]
 
 
-def discover_candidates() -> dict[str, Predictor]:
-    """Import every module in candidate_functions and return {NAME: predict}."""
+@dataclass(frozen=True)
+class Candidate:
+    predict: Predictor
+    fit: Fitter | None  # present -> scored leave-one-out
 
-    candidates: dict[str, Predictor] = {}
+    @property
+    def evaluation(self) -> str:
+        return "leave-one-out" if self.fit is not None else "as is"
+
+
+def discover_candidates() -> dict[str, Candidate]:
+    """Import every module in candidate_functions and return {NAME: candidate}. Skips modules starting with "_"."""
+
+    candidates: dict[str, Candidate] = {}
     for module_info in sorted(pkgutil.iter_modules(candidate_functions.__path__), key=lambda m: m.name):
+        if module_info.name.startswith("_"):
+            continue
         try:
             module = importlib.import_module(f"candidate_functions.{module_info.name}")
         except Exception:
@@ -64,18 +82,23 @@ def discover_candidates() -> dict[str, Predictor]:
         if name in candidates:
             logger.warning("duplicate candidate name %r in %s, skipping it", name, module_info.name)
             continue
-        candidates[name] = predict
+        fit = getattr(module, "fit", None)
+        candidates[name] = Candidate(predict=predict, fit=fit if callable(fit) else None)
     return candidates
 
 
-def evaluate(candidates: dict[str, Predictor], cases: tuple[TestCase, ...]) -> pd.DataFrame:
+def evaluate(candidates: dict[str, Candidate], cases: tuple[TestCase, ...]) -> pd.DataFrame:
     """One row per (candidate, case, model) with predicted, actual and squared residual per metric."""
 
     rows = []
-    for name, predict in candidates.items():
+    for name, candidate in candidates.items():
         for case in cases:
             error = None
             try:
+                if candidate.fit is not None:
+                    predict = candidate.fit([other for other in cases if other is not case])
+                else:
+                    predict = candidate.predict
                 predictions = predict(case.prompt)
             except Exception as exc:
                 logger.warning("%s failed on %s: %r", name, case.name, exc)
@@ -83,7 +106,7 @@ def evaluate(candidates: dict[str, Predictor], cases: tuple[TestCase, ...]) -> p
 
             for model, actual in case.actual.items():
                 predicted = predictions.get(model)
-                row = {"candidate": name, "case": case.name, "model": model, "error": error}
+                row = {"candidate": name, "evaluation": candidate.evaluation, "case": case.name, "model": model, "error": error}
                 for metric in METRICS:
                     p = getattr(predicted, metric) if predicted is not None else None
                     a = getattr(actual, metric)
@@ -166,14 +189,14 @@ def main() -> None:
     logger.info("%d cases, candidates: %s", len(cases), ", ".join(candidates))
 
     details = evaluate(candidates, cases)
-    summary = summarize(details, by=["candidate"])
-    by_model = summarize(details, by=["candidate", "model"]).sort_values(["model", "candidate"], ignore_index=True)
+    summary = summarize(details, by=["candidate", "evaluation"])
+    by_model = summarize(details, by=["candidate", "evaluation", "model"]).sort_values(["model", "candidate"], ignore_index=True)
 
     out = args.out or RESULTS_DIR / f"prediction_eval_{datetime.now():%Y-%m-%d_%H-%M-%S}.xlsx"
     write_report(out, summary, by_model, details)
 
     with pd.option_context("display.width", 200, "display.float_format", "{:.6g}".format):
-        print(summary[["candidate", *(f"{m}_RMSE" for m in METRICS), "errors"]].to_string(index=False))
+        print(summary[["candidate", "evaluation", *(f"{m}_RMSE" for m in METRICS), "errors"]].to_string(index=False))
     logger.info("report written to %s", out)
 
 
