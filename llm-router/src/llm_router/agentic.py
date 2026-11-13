@@ -65,6 +65,23 @@ def params() -> dict[str, list[float]]:
     return fit(load())
 
 
+@cache
+def cost_band(lo_q: float = 0.10, hi_q: float = 0.90) -> tuple[float, float]:
+    """Multipliers on the point estimate covering 80% of real runs (from held-out residuals).
+
+    One run of the same task varies a lot, so a range is the honest output; a sharper point
+    estimate was not found (text TF-IDF, repo history and early-turn cost all scored about the same).
+    """
+    rows, ratios = load(), []
+    for k in range(5):
+        train = [r for i, r in enumerate(rows) if i % 5 != k]
+        w = fit(train)
+        for r in rows[k::5]:
+            ratios.append(price("claude-opus-5-5", r) / price("claude-opus-5-5", tokens(w, r["prompt_len"])))
+    ratios.sort()
+    return ratios[int(lo_q * len(ratios))], ratios[int(hi_q * len(ratios)) - 1]
+
+
 def tokens(w: dict, prompt_len: float) -> dict[str, float]:
     f = x(prompt_len)
     return {t: math.exp(sum(a * b for a, b in zip(w[t], f))) - 1 for t in TARGETS}
@@ -81,8 +98,10 @@ def predict(prompt: str, w: dict | None = None) -> dict[str, dict[str, float]]:
     for m in PRICES:
         tok = {t: base[t] * RATIO[m][t] for t in TARGETS}
         per_turn, per_out = SPEED[m]
-        out[m] = {"cost": price(m, tok), "latency": tok["turns"] * per_turn + tok["out"] * per_out,
-                  "turns": tok["turns"]}
+        lo, hi = cost_band()
+        c, lat = price(m, tok), tok["turns"] * per_turn + tok["out"] * per_out
+        out[m] = {"cost": c, "latency": lat, "turns": tok["turns"],
+                  "cost_range": (c * lo, c * hi), "latency_range": (lat * lo, lat * hi)}
     return out
 
 
@@ -102,7 +121,9 @@ def holdout_report(seed: int = 0, folds: int = 5) -> str:
             model_err.append(abs(pred - true) / true)
             base_err.append(abs(med - true) / true)
             within2.append(0.5 <= pred / true <= 2)
-    return (f"{len(rows)} SWE-bench Pro tasks, {folds}-fold held out, Opus cost: median abs error "
+    lo, hi = cost_band()
+    return (f"80% range = point x {lo:.2f}..{hi:.2f}\n"
+            f"{len(rows)} SWE-bench Pro tasks, {folds}-fold held out, Opus cost: median abs error "
             f"{median(model_err):.0%} (constant median: {median(base_err):.0%}); "
             f"within 2x of truth: {sum(within2) / len(within2):.0%}")
 
@@ -113,4 +134,6 @@ if __name__ == "__main__":
               "Implement OAuth login across the web app and API: " + "requirements ... " * 200):
         print(f"\n{p[:60]!r} ({len(p)} chars)")
         for m, v in predict(p).items():
-            print(f"  {m:18} ${v['cost']:.3f}  {v['latency'] / 60:.1f} min  {v['turns']:.0f} turns")
+            (lo, hi), (llo, lhi) = v["cost_range"], v["latency_range"]
+            print(f"  {m:18} ${v['cost']:.3f} (80%: ${lo:.3f}-${hi:.3f})  "
+                  f"{v['latency'] / 60:.1f} min ({llo / 60:.1f}-{lhi / 60:.1f})  {v['turns']:.0f} turns")
