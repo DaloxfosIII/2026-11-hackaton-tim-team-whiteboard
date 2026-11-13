@@ -24,14 +24,15 @@ def predict_metrics(prompt: str) -> dict[ModelChoice, MetricScores]:
     prompt.
 
     Dummy implementation: fixed numbers, scaled slightly by prompt length.
+    Quality is on the 0-5 scale from tests/quality_scale.md.
     """
 
     scale = 1 + len(prompt) / 1000
 
     return {
-        "claude-haiku-5-5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=0.6),
-        "claude-sonnet-5-5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=0.8),
-        "claude-opus-5-5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=0.95),
+        "claude-haiku-5-5": MetricScores(cost=0.001 * scale, latency=0.5 * scale, quality=3.0),
+        "claude-sonnet-5-5": MetricScores(cost=0.01 * scale, latency=1.5 * scale, quality=4.0),
+        "claude-opus-5-5": MetricScores(cost=0.05 * scale, latency=3.0 * scale, quality=4.75),
     }
 
 

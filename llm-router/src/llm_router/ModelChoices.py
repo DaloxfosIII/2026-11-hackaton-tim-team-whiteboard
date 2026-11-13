@@ -11,3 +11,10 @@ ModelChoice = Literal[
 ]
 
 ModelChoices: frozenset[str] = frozenset(get_args(ModelChoice))
+
+## Short tier names used in test result file names (<case>-result-<tier>.json).
+TIERS: dict[str, ModelChoice] = {
+    "haiku": "claude-haiku-5-5",
+    "sonnet": "claude-sonnet-5-5",
+    "opus": "claude-opus-5-5",
+}

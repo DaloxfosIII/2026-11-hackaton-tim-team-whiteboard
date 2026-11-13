@@ -1,2 +1,4 @@
 
 .env
+# Prediction evaluation reports
+tests/predict_metrics/results/

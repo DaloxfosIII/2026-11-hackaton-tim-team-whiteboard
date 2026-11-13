@@ -25,17 +25,11 @@ from pathlib import Path
 import anthropic
 
 from llm_router.MetricScores import MetricScores
-from llm_router.ModelChoices import ModelChoice
+from llm_router.ModelChoices import TIERS, ModelChoice
 
 logger = logging.getLogger(__name__)
 
 CASES_DIR = Path(__file__).parent / "test_cases"
-
-TIERS: dict[str, ModelChoice] = {
-    "haiku": "claude-haiku-5-5",
-    "sonnet": "claude-sonnet-5-5",
-    "opus": "claude-opus-5-5",
-}
 
 # List prices in USD per 1M tokens (input, output), as of 2026-11.
 # Haiku's price holds for prompts up to 100K tokens, far above our test prompts.
