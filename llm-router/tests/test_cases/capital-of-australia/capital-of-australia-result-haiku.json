@@ -1,6 +1,6 @@
 {
     "returned": "The capital of Australia is **Canberra**. Many people guess Sydney or Melbourne, but Canberra was purpose-built as the capital as a compromise between those two rival cities.",
-    "quality": null,
+    "quality": 4,
     "cost": 3.23e-05,
     "latency": 0.923575400000118
 }

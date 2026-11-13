@@ -1,6 +1,6 @@
 {
     "returned": "The capital of Australia is **Canberra**. It was purpose-built as a compromise between Sydney and Melbourne, which both wanted to be the capital, and it officially became the seat of government in 1927.",
-    "quality": null,
+    "quality": 4.5,
     "cost": 0.001572,
     "latency": 1.4082602999997107
 }

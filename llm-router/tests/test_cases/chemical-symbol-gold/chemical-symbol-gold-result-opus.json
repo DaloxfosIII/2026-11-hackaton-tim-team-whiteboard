@@ -1,6 +1,6 @@
 {
     "returned": "The chemical symbol for gold is **Au**, from the Latin word *aurum*, meaning \"gold.\" Its atomic number is 79.",
-    "quality": null,
+    "quality": 5,
     "cost": 0.001144,
     "latency": 1.3681902999996964
 }

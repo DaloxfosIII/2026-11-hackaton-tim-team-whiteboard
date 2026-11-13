@@ -1,6 +1,6 @@
 {
     "returned": "The hands overlap **22 times** in a 24-hour day, not 24.\n\n**Why it isn't 24:** The naive answer assumes the hands meet once at each hour mark, which would give 12 meetings per 12-hour half-day. But the hands don't line up exactly on the hours after the first one.\n\n- The minute hand moves 360° per hour and the hour hand moves 30° per hour, so the minute hand gains 330° per hour on the hour hand.\n- To lap the hour hand, the minute hand must gain a full 360°. That takes 360/330 = 12/11 hours, or about 65 minutes 27 seconds.\n- So the overlaps occur at times t = k × 12/11 hours, and in each 12-hour cycle the meetings are:\n\n12:00, 1:05:27, 2:10:55, 3:16:22, 4:21:49, 5:27:16, 6:32:44, 7:38:11, 8:43:38, 9:49:05, 10:54:33\n\nThat's 11 overlaps. The next one would be at 12:00, but that is the start of the next 12-hour cycle, so it isn't counted again.\n\n**Total:** 11 overlaps per 12 hours × 2 cycles = **22 per day**.\n\nEquivalently, 24 hours ÷ (12/11 hours per overlap) = 22.",
-    "quality": null,
+    "quality": 5,
     "cost": 0.0005853,
     "latency": 6.3066830999996455
 }

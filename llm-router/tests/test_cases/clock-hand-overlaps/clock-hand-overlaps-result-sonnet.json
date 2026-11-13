@@ -1,6 +1,6 @@
 {
     "returned": "**Answer: 22 times.**\n\n**Reasoning with relative speed**\n\n- The minute hand goes around 360° per hour.\n- The hour hand goes around 30° per hour.\n- The minute hand gains on the hour hand at 360 − 30 = 330° per hour.\n\nThe hands coincide each time the minute hand gains a full 360° on the hour hand. That takes 360/330 = 12/11 hours, which is about 1 hour 5.45 minutes.\n\nIn 24 hours the number of overlaps is 24 ÷ (12/11) = 24 × 11/12 = **22**.\n\n**Why not 24?**\n\nIt's tempting to think the hands meet once every hour, since there are 24 hours. But the hour hand doesn't stand still. By the time the minute hand returns to the 12 position after an hour, the hour hand has moved ahead, so the minute hand needs a bit more than an hour to catch up. Each overlap therefore comes slightly later than once per hour (every 1 h 5 5/11 min).\n\nThe overlap times are:\n12:00, about 1:05:27, 2:10:55, 3:16:22, 4:21:49, 5:27:16, 6:32:44, 7:38:11, 8:43:38, 9:49:05, 10:54:33, and then 12:00 again.\n\nNotice that there is **no overlap during the 11 o'clock hour**. The overlap that would \"belong\" to 11:xx happens exactly at 12:00. So in each 12-hour period there are 11 overlaps, not 12, because the 11th and 12th coincide at 12:00. Over 24 hours that gives 11 × 2 = 22.",
-    "quality": null,
+    "quality": 5,
     "cost": 0.005496,
     "latency": 5.331145299999662
 }

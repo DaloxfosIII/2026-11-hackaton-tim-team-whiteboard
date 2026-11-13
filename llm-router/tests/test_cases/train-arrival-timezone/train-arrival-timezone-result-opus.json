@@ -1,0 +1,6 @@
+{
+    "returned": "The local arrival time is **18:35**.\n\n1. **Add the journey time:** 14:45 + 2 h 50 min = 17:35 (in the departure station's time zone).\n2. **Adjust for the time zone:** The destination is one hour ahead, so 17:35 + 1 hour = **18:35** (6:35 PM).",
+    "quality": 5,
+    "cost": 0.003008,
+    "latency": 1.9278447000006054
+}
